@@ -8,7 +8,7 @@ public class TabsManager : MonoBehaviour
 
     public GameObject[] tabs;
     public GameObject[] buttons;
-    public enum Tabs { Main, WordList, };
+    public enum Tabs { Main, WordList, Settings, };
     public Tabs currentTab;
 
     // Start is called before the first frame update

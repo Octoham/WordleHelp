@@ -6,6 +6,8 @@ using TMPro;
 
 public class Main : MonoBehaviour
 {
+    public Settings settings = new Settings();
+    public TabsManager tabsManager;
 
     public string word = "    ";
     public bool wordValidated = false;
@@ -16,20 +18,37 @@ public class Main : MonoBehaviour
 
     public string errorMessage = "";
     public TMP_Text errorText;
+    public string formattedWords = "";
+    public TMP_Text formattedText;
 
     public string[] allowedWords;
     public string[] possibleWords;
     public List<string> remainingWords;
     public List<string> remainingGuesses;
 
-
+    void Awake()
+    {
+        if (settings.check())
+        {
+            settings = settings.loadPlayer();
+        }
+        tabsManager.tabs[2].GetComponentInChildren<Toggle>().isOn = settings.extendedWordList;
+    }
     // Start is called before the first frame update
     void Start()
     {
         errorMessage = "";
+        formattedWords = "";
         allowedWords = WordList.allowedWords;
         possibleWords = WordList.possibleWords;
-        remainingWords = new List<string>(possibleWords);
+        if (settings.extendedWordList)
+        {
+            remainingWords = new List<string>(allowedWords);
+        }
+        else
+        {
+            remainingWords = new List<string>(possibleWords);
+        }
         remainingGuesses = new List<string>(allowedWords);
         for (int i = 0; i < states.Length; i++)
         {
@@ -49,6 +68,10 @@ public class Main : MonoBehaviour
         if (errorMessage != errorText.text)
         {
             errorText.text = errorMessage;
+        }
+        if(tabsManager.currentTab == TabsManager.Tabs.WordList)
+        {
+            formattedText.text = formattedWords;
         }
     }
 
@@ -344,7 +367,8 @@ public class Main : MonoBehaviour
                 indexes.Clear();
             }
         }
-        
+
+        formattedWords = FormatWords();
     }
 
     public void ValidateWord()
@@ -391,5 +415,27 @@ public class Main : MonoBehaviour
             states[button] = 0;
         }
         LetterColor(button, states[button]);
+    }
+
+    public string FormatWords()
+    {
+        string formattedWords = "";
+
+        foreach(string word in remainingWords)
+        {
+            formattedWords += (word + "\n");
+        }
+
+        return formattedWords;
+    }
+
+    public void SaveSettings()
+    {
+        settings.savePlayer();
+    }
+
+    public void UseExtendedWordList(bool value)
+    {
+        settings.extendedWordList = value;
     }
 }
